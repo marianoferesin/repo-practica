@@ -2,6 +2,9 @@ package isi.died.parcial01.ejercicio02.dominio;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import isi.died.parcial01.ejercicio02.dominio.Inscripcion.Estado;
 
 public class Alumno {
 	
@@ -47,6 +50,40 @@ public class Alumno {
 	public void addCursada(Inscripcion e) {
 		this.materiasCursadas.add(e);
 		e.setInscripto(this);
+	}
+
+
+	public boolean materiaYaCursada(Materia materia) {
+		return materiasCursadas.stream()
+				.filter(i -> i.getMateria() == materia)
+				.filter(i -> i.getEstado() == Estado.LIBRE)
+				.findAny()
+				.isPresent();
+	}
+
+
+	public void promocionarMateria(Materia materia) {
+		Inscripcion inscripcionAPromocionar = new Inscripcion();
+		
+		for(Inscripcion insc: materiasCursadas) {
+			if(insc.getMateria() == materia) inscripcionAPromocionar = insc;
+		}
+		
+		inscripcionAPromocionar.setEstado(Estado.PROMOCIONADO);
+		
+	}
+	
+	public List<Examen> topNExamenes(Integer n,Integer nota){
+		
+		List <Examen> listaExamenes = examenes.stream()
+				.filter(e -> e.getNota()>=nota)
+				.collect(Collectors.toList());
+		
+		listaExamenes.sort((e1,e2) -> (e2.getNota()).compareTo(e1.getNota()));
+		
+		while(listaExamenes.size()>n) listaExamenes.remove(listaExamenes.size()-1);
+		
+		return listaExamenes;
 	}
 
 }

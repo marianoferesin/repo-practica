@@ -89,7 +89,11 @@ public class App {
 
 
 		
-		sistema.inscribirAlumnoCursada(prof1, a1, m1,2020);
+		try {
+			sistema.inscribirAlumnoCursada(prof1, a1, m1,2020);
+		} catch (MateriaYaCursadaException e) {
+			e.printStackTrace();
+		}
 
 		sistema.inscribirAlumnoExamen(prof1, a1, m1);
 	}

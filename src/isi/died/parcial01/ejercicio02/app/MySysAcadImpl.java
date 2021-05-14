@@ -5,7 +5,7 @@ import java.util.List;
 
 import isi.died.parcial01.ejercicio02.db.BaseDeDatos;
 import isi.died.parcial01.ejercicio02.dominio.*;
-
+import isi.died.parcial01.ejercicio02.db.BaseDeDatosExcepcion;
 
 public class MySysAcadImpl implements MySysAcad {
 	private static final BaseDeDatos DB = new BaseDeDatos();
@@ -34,13 +34,24 @@ public class MySysAcadImpl implements MySysAcad {
 	
 
 	@Override
-	public void inscribirAlumnoCursada(Docente d, Alumno a, Materia m, Integer cicloLectivo) {
+	public void inscribirAlumnoCursada(Docente d, Alumno a, Materia m, Integer cicloLectivo) throws MateriaYaCursadaException {
 		Inscripcion insc = new Inscripcion(cicloLectivo,Inscripcion.Estado.CURSANDO);
 		d.agregarInscripcion(insc);
 		a.addCursada(insc);
 		m.addInscripcion(insc);
 		// DESCOMENTAR Y gestionar excepcion
-		// DB.guardar(insc);
+		
+		try {
+			DB.guardar(insc);
+		}
+		catch (BaseDeDatosExcepcion e) {
+			if(a.materiaYaCursada(m)) {
+				
+				throw new MateriaYaCursadaException("El alumno ya curso o esta cursando la materia a la que se quiso inscribir");
+				
+			}
+			
+		}
 	}
 
 	@Override
@@ -52,6 +63,29 @@ public class MySysAcadImpl implements MySysAcad {
 		// DESCOMENTAR Y gestionar excepcion
 		// DB.guardar(e);
 	}
+	
+	public void registrarNota(Examen examen, Integer nota) {
+		
+		examen.setNota(nota);
+		
+		if(nota >= 6) {
+			Alumno alumno = examen.getAlumno();
+			
+			alumno.promocionarMateria(examen.getMateria());
+			
+		}
+		
+	}
+	
+	
+	public List<Examen> topNExamenes(Alumno a,Integer n,Integer nota){
+		
+		return a.topNExamenes(n, nota);
+				
+		
+		
+	}
+	
 	
 
 }
